@@ -17,7 +17,7 @@ public final class Calculator extends javax.swing.JFrame {
 
     private int x, y;
     
-        // --- Singleton ---
+        // --- Singleton Method ---
     private static Calculator INSTANCE;
 
     public static Calculator getInstance() {
@@ -26,6 +26,29 @@ public final class Calculator extends javax.swing.JFrame {
         }
         return INSTANCE;
     }
+    
+    // --- Factory Method ---
+@FunctionalInterface
+private interface Operation {double apply(double a, double b);
+}
+
+private Operation makeOperation(String symbol) {
+    switch (symbol) {
+        case "+" -> {
+            return (a, b) -> a + b;
+            }
+        case "-" -> {
+            return (a, b) -> a - b;
+            }
+        case "×", "*" -> {
+            return (a, b) -> a * b;
+            }
+        case "÷", "/" -> {
+            return (a, b) -> (b == 0) ? Double.NaN : a / b;
+            }
+        default -> throw new IllegalArgumentException("Unknown operation: " + symbol);
+    }
+}
 
     public Calculator() {
         
@@ -138,7 +161,9 @@ public final class Calculator extends javax.swing.JFrame {
         if (Float.isNaN(curr) || Float.isNaN(prev)) {
             return;
         }
-
+        
+        //deleting the switch 
+        /*..
         switch (this.operation) {
             case "+" ->
                 computation = prev + curr;
@@ -158,6 +183,21 @@ public final class Calculator extends javax.swing.JFrame {
                 return;
             }
         }
+..*/
+        
+        try {
+            if (("÷".equals(this.operation) || "/".equals(this.operation)) && curr == 0f) {
+                this.clear();
+                this.currentOperand = "Error";
+                return;
+            }
+
+            Operation op = makeOperation(this.operation);
+            computation = (float) op.apply(prev, curr); 
+        } catch (IllegalArgumentException ex) {
+            return;
+        }
+
 
         this.currentOperand = (computation - (int) computation) != 0 ? Float.toString(computation) : Integer.toString((int) computation);
         this.previousOperand = "";
