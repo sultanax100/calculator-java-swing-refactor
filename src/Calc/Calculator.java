@@ -3,6 +3,7 @@ package Calc;
 import java.awt.Color;
 import java.awt.event.*;
 import javax.swing.JButton;
+import java.beans.Beans;
 
 /**
  *
@@ -15,8 +16,26 @@ public final class Calculator extends javax.swing.JFrame {
     private String operation;
 
     private int x, y;
+    
+        // --- Singleton ---
+    private static Calculator INSTANCE;
+
+    public static Calculator getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Calculator();
+        }
+        return INSTANCE;
+    }
 
     public Calculator() {
+        
+        if (INSTANCE != null && !Beans.isDesignTime()) {
+        throw new IllegalStateException("Use Calculator.getInstance()");
+        }
+        if (INSTANCE == null) {
+            INSTANCE = this; 
+        }
+    
         initComponents();
         getContentPane().setSize(400, 700);
         this.clear();
