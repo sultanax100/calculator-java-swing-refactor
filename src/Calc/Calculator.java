@@ -3,7 +3,6 @@ package Calc;
 import java.awt.Color;
 import java.awt.event.*;
 import javax.swing.JButton;
-import java.beans.Beans;
 
 /**
  *
@@ -14,7 +13,6 @@ public final class Calculator extends javax.swing.JFrame {
     private String currentOperand;
     private String previousOperand;
     private String operation;
-
     private int x, y;
     
         // --- Singleton Method ---
@@ -28,37 +26,48 @@ public final class Calculator extends javax.swing.JFrame {
     }
     
     // --- Factory Method ---
-@FunctionalInterface
-private interface Operation {double apply(double a, double b);
+    private interface Operation { float apply(float a, float b); }
+
+    private static class AddOperation implements Operation { 
+        @Override
+    public float apply(float a,float b){
+        return a+b;} 
 }
 
-private Operation makeOperation(String symbol) {
-    switch (symbol) {
-        case "+" -> {
-            return (a, b) -> a + b;
-            }
-        case "-" -> {
-            return (a, b) -> a - b;
-            }
-        case "×", "*" -> {
-            return (a, b) -> a * b;
-            }
-        case "÷", "/" -> {
-            return (a, b) -> (b == 0) ? Double.NaN : a / b;
-            }
-        default -> throw new IllegalArgumentException("Unknown operation: " + symbol);
+    private static class SubOperation implements Operation { 
+        @Override
+        public float apply(float a,float b){
+            return a-b;}
     }
-}
 
-    public Calculator() {
-        
-        if (INSTANCE != null && !Beans.isDesignTime()) {
-        throw new IllegalStateException("Use Calculator.getInstance()");
+    private static class MultOperation implements Operation { 
+        @Override
+        public float apply(float a,float b){
+            return a*b;} 
+    }
+
+    private static class DivOperation  implements Operation { 
+        @Override
+        public float apply(float a,float b){
+            if (b == 0f) {
+                throw new ArithmeticException("Error! Division by zero is not accepted");
+            }
+            return a/b;} 
+    }
+
+    private static class OperationFactory {
+        static Operation getOperation(String op) {
+            switch (op) {
+                case "+": return new AddOperation();
+                case "-": return new SubOperation();
+                case "×": return new MultOperation();
+                case "÷": return new DivOperation();
+                default: throw new IllegalArgumentException("Unknown operation: " + op);
+            }
         }
-        if (INSTANCE == null) {
-            INSTANCE = this; 
-        }
-    
+    }
+
+    private Calculator() {
         initComponents();
         getContentPane().setSize(400, 700);
         this.clear();
@@ -151,18 +160,12 @@ private Operation makeOperation(String symbol) {
     }
 
     public void compute() {
-        float computation;
+        
         if (this.currentOperand.equals("") || this.previousOperand.equals("")) {
             return;
         }
-
-        float curr = Float.parseFloat(this.currentOperand);
-        float prev = Float.parseFloat(this.previousOperand);
-        if (Float.isNaN(curr) || Float.isNaN(prev)) {
-            return;
-        }
         
-        //deleting the switch 
+        //deleting the switch, we already have the operation interface
         /*..
         switch (this.operation) {
             case "+" ->
@@ -184,22 +187,22 @@ private Operation makeOperation(String symbol) {
             }
         }
 ..*/
-        
         try {
-            if (("÷".equals(this.operation) || "/".equals(this.operation)) && curr == 0f) {
-                this.clear();
-                this.currentOperand = "Error";
-                return;
-            }
-
-            Operation op = makeOperation(this.operation);
-            computation = (float) op.apply(prev, curr); 
-        } catch (IllegalArgumentException ex) {
+            float curr = Float.parseFloat(this.currentOperand);
+            float prev = Float.parseFloat(this.previousOperand);
+            Operation op = OperationFactory.getOperation(this.operation);
+            float result  = op.apply(prev, curr);
+        
+             this.currentOperand = (result  - (int) result ) != 0 
+                ? Float.toString(result ) 
+                : Integer.toString((int) result ); 
+             
+        } catch (IllegalArgumentException | ArithmeticException ex) {
+            this.clear();
+            this.currentOperand = "Error";
             return;
         }
-
-
-        this.currentOperand = (computation - (int) computation) != 0 ? Float.toString(computation) : Integer.toString((int) computation);
+        
         this.previousOperand = "";
         this.operation = "";
     }
