@@ -9,6 +9,7 @@ import javax.swing.JButton;
  * @author youcefhmd
  */
 public final class Calculator extends javax.swing.JFrame {
+private final CalculatorFacade facade = new CalculatorFacade();
 
     private String currentOperand;
     private String previousOperand;
@@ -63,92 +64,31 @@ public final class Calculator extends javax.swing.JFrame {
         }
     }
 
-    public void clear() {
-        this.currentOperand = "";
-        this.previousOperand = "";
-        this.operation = "";
-        this.updateDisplay();
-    }
+ public void clear() {
+    facade.clear();
+    updateDisplay();
+}
 
-    public void appendNumber(String number) {
-        if (this.currentOperand.equals("0") && number.equals("0")) {
-            return;
-        }
+public void appendNumber(String number) {
+    facade.appendNumber(number);
+    updateDisplay();
+}
 
-        if (number.equals(".") && this.currentOperand.contains(".")) {
-            return;
-        }
+   public void chooseOperation(String operation) {
+    facade.chooseOperation(operation);
+    updateDisplay();
+}
 
-        if (this.currentOperand.equals("0")
-                && !number.equals("0")
-                && !number.equals(".")) {
-            this.currentOperand = "";
-        }
 
-        this.currentOperand += number;
-        this.updateDisplay();
-    }
+public void compute() {
+    facade.compute();
+}
 
-    public void chooseOperation(String operation) {
-        if (this.currentOperand.equals("") && !this.previousOperand.equals("")) {
-            this.operation = operation;
-            this.updateDisplay();
-        }
-        if (this.currentOperand.equals("")) {
-            return;
-        }
+public void updateDisplay() {
+    current.setText(facade.getCurrentOperand());
+    previous.setText(facade.getPreviousOperand() + " " + facade.getOperation());
+}
 
-        if (!this.previousOperand.equals("")) {
-            this.compute();
-        }
-
-        this.operation = operation;
-        this.previousOperand = this.currentOperand;
-        this.currentOperand = "";
-        this.updateDisplay();
-    }
-
-    public void compute() {
-        float computation;
-        if (this.currentOperand.equals("") || this.previousOperand.equals("")) {
-            return;
-        }
-
-        float curr = Float.parseFloat(this.currentOperand);
-        float prev = Float.parseFloat(this.previousOperand);
-        if (Float.isNaN(curr) || Float.isNaN(prev)) {
-            return;
-        }
-
-        switch (this.operation) {
-            case "+" ->
-                computation = prev + curr;
-            case "-" ->
-                computation = prev - curr;
-            case "×" ->
-                computation = prev * curr;
-            case "÷" -> {
-                if (curr == 0) {
-                    this.clear();
-                    this.currentOperand = "Error";
-                    return;
-                }
-                computation = prev / curr;
-            }
-            default -> {
-                return;
-            }
-        }
-
-        this.currentOperand = (computation - (int) computation) != 0 ? Float.toString(computation) : Integer.toString((int) computation);
-        this.previousOperand = "";
-        this.operation = "";
-    }
-
-    public void updateDisplay() {
-        current.setText(this.currentOperand);
-        previous.setText(previousOperand + " " + this.operation);
-    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -615,11 +555,9 @@ public final class Calculator extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEqualActionPerformed
 
     private void btnPlusSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlusSubActionPerformed
-        if (!this.currentOperand.isBlank()) {
-            float tmp = -Float.parseFloat(this.currentOperand);
-            this.currentOperand = (tmp - (int) tmp) != 0 ? Float.toString(tmp) : Integer.toString((int) tmp);
-            this.updateDisplay();
-        }
+
+    facade.toggleSign();
+    updateDisplay();
     }//GEN-LAST:event_btnPlusSubActionPerformed
 
     private void btnCloseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCloseMouseEntered
