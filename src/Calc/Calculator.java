@@ -27,6 +27,74 @@ public final class Calculator extends javax.swing.JFrame {
     
     // --- Factory Method ---
     private interface Operation { float apply(float a, float b); }
+    
+    
+    
+    
+    
+    
+    // --- Decorator Pattern (History) ---
+
+// 1) Abstract Decorator
+private abstract static class OperationDecorator implements Operation {
+    protected Operation decoratedOperation;
+
+    public OperationDecorator(Operation decoratedOperation) {
+        this.decoratedOperation = decoratedOperation;
+    }
+
+    @Override
+    public float apply(float a, float b) {
+        return decoratedOperation.apply(a, b);
+    }
+}
+
+// 2) Concrete Decorator - History
+private static class HistoryOperation extends OperationDecorator {
+
+    private static final java.util.List<String> history = new java.util.ArrayList<>();
+
+    public HistoryOperation(Operation decoratedOperation) {
+        super(decoratedOperation);
+    }
+
+    @Override
+    public float apply(float a, float b) {
+        float result = super.apply(a, b);
+        history.add(a + " " + getSymbol(decoratedOperation) + " " + b + " = " + result);
+        return result;
+    }
+
+    private String getSymbol(Operation op) {
+        if (op instanceof AddOperation) return "+";
+        if (op instanceof SubOperation) return "-";
+        if (op instanceof MultOperation) return "×";
+        if (op instanceof DivOperation) return "÷";
+        return "?";
+    }
+
+    public static java.util.List<String> getHistory() {
+        return history;
+    }
+}
+
+    
+    
+    
+
+// Getters needed for Facade 
+public String getCurrentOperand() {
+    return currentOperand;
+}
+
+public String getPreviousOperand() {
+    return previousOperand;
+}
+
+
+
+
+
 
     private static class AddOperation implements Operation { 
         @Override
@@ -191,6 +259,21 @@ public final class Calculator extends javax.swing.JFrame {
             float curr = Float.parseFloat(this.currentOperand);
             float prev = Float.parseFloat(this.previousOperand);
             Operation op = OperationFactory.getOperation(this.operation);
+            
+            
+            
+            
+            
+            // نغلف العملية بالـ History Decorator
+            op = new HistoryOperation(op);
+            
+            
+            
+            
+            
+            
+            
+            
             float result  = op.apply(prev, curr);
         
              this.currentOperand = (result  - (int) result ) != 0 
@@ -672,6 +755,23 @@ public final class Calculator extends javax.swing.JFrame {
     private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEqualActionPerformed
         this.compute();
         this.updateDisplay();
+        
+        
+        
+        
+        System.out.println("---- History ----");
+for (String h : HistoryOperation.getHistory()) {
+    System.out.println(h);
+}
+
+        
+
+
+
+
+
+
+        
         if (this.currentOperand.equals("Error"))
             this.currentOperand = "";
     }//GEN-LAST:event_btnEqualActionPerformed
