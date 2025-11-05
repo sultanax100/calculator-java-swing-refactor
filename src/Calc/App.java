@@ -15,9 +15,8 @@ public class App {
             Calculator calculator2 = Calculator.getInstance();
             System.out.println("same instance? " + (calculator1 == calculator2));
 
-            //  بدل ما نستخدم calculator1.setVisible → نستخدم Facade
-            CalculatorFacade calc = new CalculatorFacade();
-            calc.showUI();  // هذا يعرض الواجهة
+            calculator1.setVisible(true);
+
         });
     }
 
