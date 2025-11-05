@@ -26,7 +26,9 @@ public final class Calculator extends javax.swing.JFrame {
     }
     
     // --- Factory Method ---
-    private interface Operation { float apply(float a, float b); }
+    private interface Operation { 
+        float apply(float a, float b); 
+    }
     
     
     
@@ -65,36 +67,18 @@ private static class HistoryOperation extends OperationDecorator {
         return result;
     }
 
-    private String getSymbol(Operation op) {
-        if (op instanceof AddOperation) return "+";
-        if (op instanceof SubOperation) return "-";
-        if (op instanceof MultOperation) return "×";
-        if (op instanceof DivOperation) return "÷";
-        return "?";
-    }
+private String getSymbol(Operation op) {
+    if (op instanceof AddOperation) return "+";
+    if (op instanceof SubOperation) return "-";
+    if (op instanceof MultOperation) return "×";
+    if (op instanceof DivOperation) return "÷";
+    return "?";
+}
 
     public static java.util.List<String> getHistory() {
         return history;
     }
 }
-
-    
-    
-    
-
-// Getters needed for Facade 
-public String getCurrentOperand() {
-    return currentOperand;
-}
-
-public String getPreviousOperand() {
-    return previousOperand;
-}
-
-
-
-
-
 
     private static class AddOperation implements Operation { 
         @Override
@@ -135,12 +119,12 @@ public String getPreviousOperand() {
         }
     }
 
-    private Calculator() {
-        initComponents();
+private Calculator() {
+    initComponents();
         getContentPane().setSize(400, 700);
-        this.clear();
-        this.addEvents();
-    }
+    this.clear();
+    this.addEvents();
+}
 
     public void addEvents() {
         JButton[] btns = {
@@ -180,7 +164,7 @@ public String getPreviousOperand() {
                 }
             });
         }
-    }
+        }
 
     public void clear() {
         this.currentOperand = "";
