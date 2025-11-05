@@ -1,23 +1,18 @@
 package Calc;
 
-/**
- *
- * @author youcefhmd
- */
-
 public class App {
-
-    public static void main(String[] args) {  
+    public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> {
 
-            //  اختبار الـ Singleton 
-            Calculator calculator1 = Calculator.getInstance();
-            Calculator calculator2 = Calculator.getInstance();
-            System.out.println("same instance? " + (calculator1 == calculator2));
+            CalculatorFacade calcFacade = new CalculatorFacade();
 
-            calculator1.setVisible(true);
+            // بدل ما نستدعي Calculator مباشرة:
+            calcFacade.showCalculator();
 
+            // مثال تشغيل:
+            float result = calcFacade.performOperation("+", 5, 3);
+            System.out.println("Result = " + result);
         });
     }
-
 }
+
