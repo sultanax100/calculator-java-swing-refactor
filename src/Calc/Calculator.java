@@ -26,7 +26,7 @@ public final class Calculator extends javax.swing.JFrame {
     }
     
     // --- Factory Method ---
-    private interface Operation { 
+    public interface Operation { 
         float apply(float a, float b); 
     }
     
@@ -52,7 +52,7 @@ private abstract static class OperationDecorator implements Operation {
 }
 
 // 2) Concrete Decorator - History
-private static class HistoryOperation extends OperationDecorator {
+public static class HistoryOperation extends OperationDecorator {
 
     private static final java.util.List<String> history = new java.util.ArrayList<>();
 
@@ -79,6 +79,7 @@ private String getSymbol(Operation op) {
         return history;
     }
 }
+
 
     private static class AddOperation implements Operation { 
         @Override
@@ -107,7 +108,7 @@ private String getSymbol(Operation op) {
             return a/b;} 
     }
 
-    private static class OperationFactory {
+    public static class OperationFactory {
         static Operation getOperation(String op) {
             switch (op) {
                 case "+": return new AddOperation();
