@@ -1,46 +1,34 @@
 package Calc;
 
-// Facade Pattern: Interface بسيطة للتحكم بحسابات الآلة فقط (بدون GUI)
 public class CalculatorFacade {
 
-    private final Calculator calculator;
+    private Calculator calculator;
 
     public CalculatorFacade() {
-        this.calculator = Calculator.getInstance(); // نستخدم Singleton
+        calculator = Calculator.getInstance(); //  Singleton
     }
 
-    // إدخال رقم أو نقطة
-    public void enterNumber(String number) {
-        calculator.appendNumber(number);
+    //  تفتح واجهة الآلة الحاسبة
+    public void showCalculator() {
+        calculator.setVisible(true);
     }
 
-    // اختيار عملية (+, -, ×, ÷)
-    public void chooseOperation(String operation) {
-        calculator.chooseOperation(operation);
+    //  تنفّذ عملية رياضية وتُرجع الناتج
+    public float performOperation(String operation, float a, float b) {
+        Calculator.Operation op = Calculator.OperationFactory.getOperation(operation);
+        if (op == null) {
+            throw new IllegalArgumentException("Invalid operation: " + operation);
+        }
+        return op.apply(a, b); 
     }
 
-    // = (تنفيذ العملية وعرض الناتج)
-    public void calculate() {
-        calculator.compute();
-        calculator.updateDisplay();
-    }
-
-    // C (مسح كل شيء)
-    public void clear() {
+    //  تمسح كل شي من الشاشة (Clear)
+    public void clearCalculator() {
         calculator.clear();
     }
 
-    // نقرأ الرقم الظاهر حالياً
-    public String getCurrentDisplay() {
-        return calculator.getCurrentOperand(); // لازم نضيف getter بسيط إذا غير موجود
-    }
-
-    // نقرأ الرقم السابق والعملية (مثلاً "5 +")
-    public String getPreviousDisplay() {
-        return calculator.getPreviousOperand(); // Getter بسيط أيضاً
-    }
-     // نعرض النافذة لو بغينا GUI (ما يمس الواجهة)
-    public void showUI() {
-        calculator.setVisible(true);
+    //  تعرض الـ History (من Decorator)
+    public java.util.List<String> getHistory() {
+        return Calculator.HistoryOperation.getHistory();
     }
 }
