@@ -70,8 +70,8 @@ public static class HistoryOperation extends OperationDecorator {
 private String getSymbol(Operation op) {
     if (op instanceof AddOperation) return "+";
     if (op instanceof SubOperation) return "-";
-    if (op instanceof MultOperation) return "×";
-    if (op instanceof DivOperation) return "÷";
+    if (op instanceof MultOperation) return "*";
+    if (op instanceof DivOperation) return "/";
     return "?";
 }
 
@@ -79,6 +79,32 @@ private String getSymbol(Operation op) {
         return history;
     }
 }
+
+
+
+// concrete Decorator – Logging
+private static class LoggingOperation extends OperationDecorator {
+
+    public LoggingOperation(Operation decoratedOperation) {
+        super(decoratedOperation);
+    }
+
+    @Override
+    public float apply(float a, float b) {
+        float result = super.apply(a, b);
+        System.out.println("[LOG] " + a + " " + getSymbol(decoratedOperation) + " " + b + " = " + result);
+        return result;
+    }
+
+    private String getSymbol(Operation op) {
+        if (op instanceof AddOperation) return "+";
+        if (op instanceof SubOperation) return "-";
+        if (op instanceof MultOperation) return "*";
+        if (op instanceof DivOperation) return "/";
+        return "?";
+    }
+}
+
 
 
     private static class AddOperation implements Operation { 
@@ -212,68 +238,39 @@ private Calculator() {
         this.updateDisplay();
     }
 
-    public void compute() {
-        
-        if (this.currentOperand.equals("") || this.previousOperand.equals("")) {
-            return;
-        }
-        
-        //deleting the switch, we already have the operation interface
-        /*..
-        switch (this.operation) {
-            case "+" ->
-                computation = prev + curr;
-            case "-" ->
-                computation = prev - curr;
-            case "×" ->
-                computation = prev * curr;
-            case "÷" -> {
-                if (curr == 0) {
-                    this.clear();
-                    this.currentOperand = "Error";
-                    return;
-                }
-                computation = prev / curr;
-            }
-            default -> {
-                return;
-            }
-        }
-..*/
-        try {
-            float curr = Float.parseFloat(this.currentOperand);
-            float prev = Float.parseFloat(this.previousOperand);
-            Operation op = OperationFactory.getOperation(this.operation);
-            
-            
-            
-            
-            
-            // نغلف العملية بالـ History Decorator
-            op = new HistoryOperation(op);
-            
-            
-            
-            
-            
-            
-            
-            
-            float result  = op.apply(prev, curr);
-        
-             this.currentOperand = (result  - (int) result ) != 0 
+public void compute() {
+
+    if (this.currentOperand.equals("") || this.previousOperand.equals("")) {
+        return;
+    }
+
+    try {
+        float curr = Float.parseFloat(this.currentOperand);
+        float prev = Float.parseFloat(this.previousOperand);
+
+        //  نجيب العملية الأساسية من الفاكتوري
+        Operation op = OperationFactory.getOperation(this.operation);
+
+        //  نغلفها بـ History + Logging (Decorator Pattern)
+        op = new HistoryOperation(op);
+        op = new LoggingOperation(op);
+
+        float result  = op.apply(prev, curr);
+
+        this.currentOperand = (result - (int) result) != 0 
                 ? Float.toString(result ) 
                 : Integer.toString((int) result ); 
-             
-        } catch (IllegalArgumentException | ArithmeticException ex) {
-            this.clear();
-            this.currentOperand = "Error";
-            return;
-        }
-        
-        this.previousOperand = "";
-        this.operation = "";
+
+    } catch (IllegalArgumentException | ArithmeticException ex) {
+        this.clear();
+        this.currentOperand = "Error";
+        return;
     }
+
+    this.previousOperand = "";
+    this.operation = "";
+}
+
 
     public void updateDisplay() {
         current.setText(this.currentOperand);
