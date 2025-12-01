@@ -35,12 +35,96 @@ public final class Calculator extends javax.swing.JFrame {
         return INSTANCE;
     }
 
+    
+    
+    
+    
+    
+    
+    // -------------------- State Pattern --------------------
+private CalculatorState state = new IdleState();
+
+public void setState(CalculatorState newState) {
+    this.state = newState;
+}
+
+// دوال هندل (واجهة واضحة تُنادى من الأزرار)
+public void handleNumber(String digit) {
+    state.onNumber(this, digit);
+}
+
+public void handleOperation(String op) {
+    state.onOperation(this, op);
+}
+
+public void handleEquals() {
+    state.onEquals(this);
+}
+
+public void handleClear() {
+    state.onClear(this);
+}
+// ---------------------------------------------------------
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 private Calculator() {
     initComponents();
         getContentPane().setSize(400, 700);
     this.clear();
     this.addEvents();
 }
+
+
+
+
+
+
+
+// --- Helper Methods used by States ---
+
+public void setDisplay(String value) {
+    this.currentOperand = value;
+    updateDisplay();
+}
+
+public void appendDigit(String digit) {
+    this.currentOperand += digit;
+    updateDisplay();
+}
+
+public void clearDisplay() {
+    this.currentOperand = "";
+    this.previousOperand = "";
+    updateDisplay();
+}
+
+public void saveFirstOperand() {
+    this.previousOperand = this.currentOperand;
+}
+
+public void setOperation(String op) {
+    this.operation = op;
+    updateDisplay();
+}
+// ---------------- END STATE PATTERN ---------------
+
+
+
+
+
+
+
+
 
     public void addEvents() {
         JButton[] btns = {
@@ -54,12 +138,27 @@ private Calculator() {
             btn0, btn1, btn2, btn3, btn4,
             btn5, btn6, btn7, btn8, btn9
         };
+        
+        
+        
+        
+        
+        
+        
+        
+for (JButton number : numbers) {
+    number.addActionListener((ActionEvent e) -> {
+        handleNumber(((JButton) e.getSource()).getText());
+    });
+}
 
-        for (JButton number : numbers) {
-            number.addActionListener((ActionEvent e) -> {
-                appendNumber(((JButton) e.getSource()).getText());
-            });
-        }
+
+
+
+
+
+
+
 
         for (JButton btn : btns) {
             btn.addMouseListener(new MouseAdapter() {
@@ -597,7 +696,7 @@ public void compute() {
     }//GEN-LAST:event_btnDotActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
-        clear();
+    handleClear();
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
@@ -608,25 +707,24 @@ public void compute() {
     }//GEN-LAST:event_btnDelActionPerformed
 
     private void btnPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlusActionPerformed
-        chooseOperation("+");
+        handleOperation("+");
     }//GEN-LAST:event_btnPlusActionPerformed
 
     private void btnMultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMultActionPerformed
-        chooseOperation("×");
+        handleOperation("×");
     }//GEN-LAST:event_btnMultActionPerformed
 
     private void btnSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubActionPerformed
-        chooseOperation("-");
+        handleOperation("-");
     }//GEN-LAST:event_btnSubActionPerformed
 
     private void btnDivActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDivActionPerformed
-        chooseOperation("÷");
+        handleOperation("÷");
     }//GEN-LAST:event_btnDivActionPerformed
 
     private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEqualActionPerformed
-        this.compute();
-        this.updateDisplay();
-        
+handleEquals();
+
         
         
         
