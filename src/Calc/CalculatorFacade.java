@@ -1,5 +1,9 @@
 package Calc;
 
+import Calc.Operation;
+import Calc.OperationFactory;
+import java.util.List;
+import Calc.HistoryOperation;
 public class CalculatorFacade {
 
     private Calculator calculator;
@@ -15,7 +19,7 @@ public class CalculatorFacade {
 
     //  تنفّذ عملية رياضية وتُرجع الناتج
     public float performOperation(String operation, float a, float b) {
-        Calculator.Operation op = Calculator.OperationFactory.getOperation(operation);
+        Operation op = OperationFactory.getOperation(operation);
         if (op == null) {
             throw new IllegalArgumentException("Invalid operation: " + operation);
         }
@@ -29,6 +33,6 @@ public class CalculatorFacade {
 
     //  تعرض الـ History (من Decorator)
     public java.util.List<String> getHistory() {
-        return Calculator.HistoryOperation.getHistory();
+        return HistoryOperation.getHistory();
     }
 }

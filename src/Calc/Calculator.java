@@ -3,6 +3,16 @@ package Calc;
 import java.awt.Color;
 import java.awt.event.*;
 import javax.swing.JButton;
+import Calc.Operation;
+import Calc.AddOperation;
+import Calc.SubOperation;
+import Calc.MultOperation;
+import Calc.DivOperation;
+import Calc.OperationFactory;
+import Calc.OperationDecorator;
+import Calc.HistoryOperation;
+import Calc.LoggingOperation;
+
 
 /**
  *
@@ -23,127 +33,6 @@ public final class Calculator extends javax.swing.JFrame {
             INSTANCE = new Calculator();
         }
         return INSTANCE;
-    }
-    
-    // --- Factory Method ---
-    public interface Operation { 
-        float apply(float a, float b); 
-    }
-    
-    
-    
-    
-    
-    
-    // --- Decorator Pattern (History) ---
-
-// 1) Abstract Decorator
-private abstract static class OperationDecorator implements Operation {
-    protected Operation decoratedOperation;
-
-    public OperationDecorator(Operation decoratedOperation) {
-        this.decoratedOperation = decoratedOperation;
-    }
-
-    @Override
-    public float apply(float a, float b) {
-        return decoratedOperation.apply(a, b);
-    }
-}
-
-// 2) Concrete Decorator - History
-public static class HistoryOperation extends OperationDecorator {
-
-    private static final java.util.List<String> history = new java.util.ArrayList<>();
-
-    public HistoryOperation(Operation decoratedOperation) {
-        super(decoratedOperation);
-    }
-
-    @Override
-    public float apply(float a, float b) {
-        float result = super.apply(a, b);
-        history.add(a + " " + getSymbol(decoratedOperation) + " " + b + " = " + result);
-        return result;
-    }
-
-private String getSymbol(Operation op) {
-    if (op instanceof AddOperation) return "+";
-    if (op instanceof SubOperation) return "-";
-    if (op instanceof MultOperation) return "*";
-    if (op instanceof DivOperation) return "/";
-    return "?";
-}
-
-    public static java.util.List<String> getHistory() {
-        return history;
-    }
-}
-
-
-
-// concrete Decorator – Logging
-private static class LoggingOperation extends OperationDecorator {
-
-    public LoggingOperation(Operation decoratedOperation) {
-        super(decoratedOperation);
-    }
-
-    @Override
-    public float apply(float a, float b) {
-        float result = super.apply(a, b);
-        System.out.println("[LOG] " + a + " " + getSymbol(decoratedOperation) + " " + b + " = " + result);
-        return result;
-    }
-
-    private String getSymbol(Operation op) {
-        if (op instanceof AddOperation) return "+";
-        if (op instanceof SubOperation) return "-";
-        if (op instanceof MultOperation) return "*";
-        if (op instanceof DivOperation) return "/";
-        return "?";
-    }
-}
-
-
-
-    private static class AddOperation implements Operation { 
-        @Override
-    public float apply(float a,float b){
-        return a+b;} 
-}
-
-    private static class SubOperation implements Operation { 
-        @Override
-        public float apply(float a,float b){
-            return a-b;}
-    }
-
-    private static class MultOperation implements Operation { 
-        @Override
-        public float apply(float a,float b){
-            return a*b;} 
-    }
-
-    private static class DivOperation  implements Operation { 
-        @Override
-        public float apply(float a,float b){
-            if (b == 0f) {
-                throw new ArithmeticException("Error! Division by zero is not accepted");
-            }
-            return a/b;} 
-    }
-
-    public static class OperationFactory {
-        static Operation getOperation(String op) {
-            switch (op) {
-                case "+": return new AddOperation();
-                case "-": return new SubOperation();
-                case "×": return new MultOperation();
-                case "÷": return new DivOperation();
-                default: throw new IllegalArgumentException("Unknown operation: " + op);
-            }
-        }
     }
 
 private Calculator() {
