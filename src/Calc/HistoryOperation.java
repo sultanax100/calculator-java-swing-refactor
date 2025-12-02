@@ -1,12 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package Calc;
 
 import java.util.ArrayList;
 import java.util.List;
-public class HistoryOperation extends OperationDecorator{
+public class HistoryOperation extends OperationDecorator {
     private static final List<String> history = new ArrayList<>();
 
     public HistoryOperation(Operation decoratedOperation) {
@@ -27,6 +24,10 @@ public class HistoryOperation extends OperationDecorator{
         if (op instanceof DivOperation) return "÷";
         return "?";
     }
+    //اضفنا الدالة عشان تتعامل مع الكوماند باترن
+    public static void addEntry(String entry) {
+    history.add(entry);
+}
 
     public static List<String> getHistory() {
         return history;

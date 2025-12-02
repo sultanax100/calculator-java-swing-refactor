@@ -19,7 +19,7 @@ import Calc.LoggingOperation;
  * @author youcefhmd
  */
 public final class Calculator extends javax.swing.JFrame {
-
+    
     private String currentOperand;
     private String previousOperand;
     private String operation;
@@ -38,9 +38,50 @@ public final class Calculator extends javax.swing.JFrame {
     
     
     
-    
-    
-    
+    // -------------------- Command Pattern --------------------
+ 
+public java.util.Stack<Command> undoStack = new java.util.Stack<>();
+public java.util.Stack<Command> redoStack = new java.util.Stack<>();
+
+public void undoLast() {
+    if (!undoStack.isEmpty()) {
+        Command cmd = undoStack.pop();
+        cmd.undo();
+        redoStack.push(cmd);
+    }
+}
+
+public void redoLast() {
+    if (!redoStack.isEmpty()) {
+        Command cmd = redoStack.pop();
+        cmd.execute();
+        undoStack.push(cmd);
+    }
+}
+
+
+
+void applyRedo(String curr) {
+    this.currentOperand = curr;
+    this.previousOperand = "";
+    this.operation = "";
+    updateDisplay();
+}
+
+void applyUndo(String prev, String curr, String op) {
+    this.previousOperand = prev;
+    this.currentOperand = curr;
+    this.operation = op;
+    updateDisplay();
+}
+
+    // --------------------END Command Pattern --------------------
+
+
+
+
+
+  
     // -------------------- State Pattern --------------------
 private CalculatorState state = new IdleState();
 
@@ -227,6 +268,16 @@ for (JButton number : numbers) {
     }
 
 public void compute() {
+    
+    
+    
+String beforePrev = this.previousOperand;
+String beforeCurr = this.currentOperand;
+String beforeOp   = this.operation;
+
+
+
+
 
     if (this.currentOperand.equals("") || this.previousOperand.equals("")) {
         return;
@@ -255,6 +306,33 @@ public void compute() {
         return;
     }
 
+    
+    
+    
+    
+    
+   //هنا تنفيذ الكوماند باترن 
+    String afterCurr = this.currentOperand;
+
+Command cmd = new ComputeCommand(
+    this,
+    OperationFactory.getOperation(beforeOp),
+    beforePrev,
+    beforeCurr,
+    beforeOp,
+    afterCurr
+);
+
+undoStack.push(cmd);
+redoStack.clear();
+
+    
+    
+    
+    
+    
+    
+    
     this.previousOperand = "";
     this.operation = "";
 }
@@ -293,6 +371,9 @@ public void compute() {
         btn0 = new javax.swing.JButton();
         btnDot = new javax.swing.JButton();
         btnEqual = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        btnUndo = new javax.swing.JButton();
+        btnRedo = new javax.swing.JButton();
         titleBar = new javax.swing.JPanel();
         title = new javax.swing.JLabel();
         btnMini = new javax.swing.JButton();
@@ -607,6 +688,25 @@ public void compute() {
         });
         buttonsPanel.add(btnEqual, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 300, -1, -1));
 
+        jButton1.setText("jButton1");
+        buttonsPanel.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, -1, -1));
+
+        btnUndo.setText("Undo");
+        btnUndo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUndoActionPerformed(evt);
+            }
+        });
+        buttonsPanel.add(btnUndo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, -1, 20));
+
+        btnRedo.setText("Redo");
+        btnRedo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRedoActionPerformed(evt);
+            }
+        });
+        buttonsPanel.add(btnRedo, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 0, -1, 20));
+
         app.add(buttonsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 140, 320, 390));
 
         titleBar.setBackground(new java.awt.Color(21, 20, 22));
@@ -790,6 +890,16 @@ for (String h : HistoryOperation.getHistory()) {
         this.setLocation(xx - x, yy - y);
     }//GEN-LAST:event_titleBarMouseDragged
 
+    private void btnUndoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUndoActionPerformed
+        // TODO add your handling code here:
+        undoLast();
+    }//GEN-LAST:event_btnUndoActionPerformed
+
+    private void btnRedoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRedoActionPerformed
+        // TODO add your handling code here:
+        redoLast();
+    }//GEN-LAST:event_btnRedoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel app;
     private static javax.swing.JButton btn0;
@@ -812,9 +922,12 @@ for (String h : HistoryOperation.getHistory()) {
     private static javax.swing.JButton btnMult;
     private static javax.swing.JButton btnPlus;
     private static javax.swing.JButton btnPlusSub;
+    private javax.swing.JButton btnRedo;
     private static javax.swing.JButton btnSub;
+    private javax.swing.JButton btnUndo;
     private javax.swing.JPanel buttonsPanel;
     private javax.swing.JTextField current;
+    private javax.swing.JButton jButton1;
     private javax.swing.JTextField previous;
     private javax.swing.JPanel resultsPanel;
     private javax.swing.JLabel title;
